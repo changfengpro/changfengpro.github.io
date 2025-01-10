@@ -4,32 +4,6 @@
   
     
     <entry>
-      <title>RMer</title>
-      <link href="/2025/01/10/RMer-1/"/>
-      <url>/2025/01/10/RMer-1/</url>
-      
-        <content type="html"><![CDATA[<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>RMer</title>
-      <link href="/2025/01/10/RMer/"/>
-      <url>/2025/01/10/RMer/</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>RoboMaster</title>
       <link href="/2025/01/02/RoboMaster/"/>
       <url>/2025/01/02/RoboMaster/</url>
