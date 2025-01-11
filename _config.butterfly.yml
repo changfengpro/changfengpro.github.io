@@ -372,14 +372,16 @@ inject:
     - <script src="/js/widget.js"></script>
     # 一图流（将文章的蓝框改为首页背景）
     - <script src="/js/modify.js"></script>
+    - <script src="/js/remove-duplicate-toc.js"></script> # 删除多余的目录
 
 
 # TOC 目录
 toc:
   post: true
-  page: false
+  page: true
   number: true
-  expand: false
+  expand: true
+
   # Only for post
   style_simple: false
   scroll_percent: true
