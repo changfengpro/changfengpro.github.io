@@ -6,7 +6,9 @@
     "build": "hexo generate",
     "clean": "hexo clean",
     "deploy": "hexo deploy",
-    "server": "hexo server"
+    "server": "hexo server",
+    "postgenerate": "node ./scripts/modify-font-size.js",  
+    "postserver": "node ./scripts/modify-font-size.js" 
   },
   "hexo": {
     "version": "7.3.0"
@@ -38,6 +40,9 @@
     "hexo-tag-aplayer": "^3.0.4",
     "hexo-theme-butterfly": "^5.2.2",
     "hexo-theme-landscape": "^1.0.0",
+    "hexo-toc": "^1.1.0",
+    "hexo-wordcount": "^6.0.1",
     "social-share.js": "^1.0.16"
   }
 }
+
