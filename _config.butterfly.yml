@@ -361,10 +361,11 @@ inject:
     - <link rel="stylesheet" href="/css/custom.css"  media="defer" onload="this.media='all'">
     - <link rel="stylesheet" href="/css/modify.css">
     - <link rel="stylesheet" href="/css/inject.css"> #文字烟雾
-  pjax: false
+  pjax: true
   bottom:
     # 音乐播放器
     - <div class="aplayer no-destroy" data-id="13087934486" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false"> </div> 
+    # - <div class="aplayer no-destroy" data-id="9405450332" data-server="tencent" data-type="playlist" data-fixed="true" data-autoplay="false"> </div> 
     - <canvas id="star-canvas"></canvas> # 鼠标滑动星星特效
     - <script src="/js/poem.js"></script>
     - <script src="/js/star-canvas.js"></script>
@@ -566,6 +567,6 @@ custom_text: Hi, welcome to my <a href="http://rmer-yhl.ip-ddns.com/">blog</a>!
 
 #加载动画
 preloader:
-  enable: true
+  enable: false
   source: 1 #可选值1=fullpage或2=progress bar，可查看https://codebyzach.github.io/pace/
   pace_css_url: 
