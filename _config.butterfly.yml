@@ -361,6 +361,15 @@ inject:
     - <link rel="stylesheet" href="/css/custom.css"  media="defer" onload="this.media='all'">
     - <link rel="stylesheet" href="/css/modify.css">
     - <link rel="stylesheet" href="/css/inject.css"> #文字烟雾
+    - <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?2397d1f3a8f641abf24a10e9215cd145";
+          var s = document.getElementsByTagName("script")[0]; 
+          s.parentNode.insertBefore(hm, s);
+        })();
+      </script> #百度统计    
   pjax: true
   bottom:
     # 音乐播放器
@@ -570,3 +579,4 @@ preloader:
   enable: false
   source: 1 #可选值1=fullpage或2=progress bar，可查看https://codebyzach.github.io/pace/
   pace_css_url: 
+

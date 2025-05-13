@@ -69,3 +69,15 @@ device是你的jlink中间的芯片的型号，我的是stm32f103。其他的与
 # JLink提取固件教程
 
 ***详细教程待完善***
+
+# 附录
+```
+exec setsn=20090928			//设置下载器SN码，下载器制作好时默认-1，需手动更改且只能更改一次
+                            //SN码根据自己喜好设置
+                            //下面为下载器需要的许可证
+exec addfeature RDI			//添加RDI
+exec addfeature FlashDL		//添加FlashDL
+exec addfeature FlashBP  	//添加FlashBP
+exec addfeature JFlash		//添加JFlash
+exec addfeature GDBFull		//添加GDB
+```
