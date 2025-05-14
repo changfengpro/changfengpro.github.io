@@ -2,12 +2,15 @@
 title: JLink刷固件
 date: 2025-03-05 22:56:28
 tags: STM32
+toc: true
 ---
 
 {% poem smoke:true author:王勃 source:滕王阁序 %}
 关山难越，谁悲失路之人；
 萍水相逢，尽是他乡之客。
 {% endpoem %} 
+
+<!-- toc -->
 
 # JLinK刷固件教程
 解决市面上购买到的盗版jlink使用Ozone时的报错问题（采用重刷固件及添加License的方式）

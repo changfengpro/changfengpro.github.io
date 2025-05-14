@@ -378,6 +378,8 @@ inject:
     - <canvas id="star-canvas"></canvas> # 鼠标滑动星星特效
     - <script src="/js/poem.js"></script>
     - <script src="/js/star-canvas.js"></script>
+    - <script src="/js/fix-toc.js"></script>
+    - <script src="/js/smooth-scroll.js"></script>
     # 随机文章
     - <script src="/js/widget.js"></script>
     # 一图流（将文章的蓝框改为首页背景）
@@ -391,7 +393,6 @@ toc:
   page: true
   number: true
   expand: true
-
   # Only for post
   style_simple: false
   scroll_percent: true
@@ -403,6 +404,7 @@ toc:
     position: after
     symbol: '#'
     style: header-anchor
+
 
 # 文章编辑按钮
 # Post edit
@@ -579,4 +581,24 @@ preloader:
   enable: false
   source: 1 #可选值1=fullpage或2=progress bar，可查看https://codebyzach.github.io/pace/
   pace_css_url: 
+
+history_calendar:
+  priority: 4
+  enable: true
+  enable_page: all
+  layout:
+    type: class
+    name: sticky_layout
+    index: 0
+  temple_html: '<div class="card-widget card-history"><div class="card-content"><div class="item-headline"><i class="fas fa-clock fa-spin"></i><span>那年今日</span></div><div id="history-baidu" style="height: 100px;overflow: hidden"><div class="history_swiper-container" id="history-container" style="width: 100%;height: 100%"><div class="swiper-wrapper" id="history_container_wrapper" style="height:20px"></div></div></div></div>'
+  
+error_404:
+  enable: true
+  subtitle: '页面没有找到'
+  background:
+
+# marked:
+#   anchors:
+#     level: 2       # 从 h2 开始生成锚点
+#     permalink: false
 
