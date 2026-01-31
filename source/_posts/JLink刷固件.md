@@ -5,10 +5,7 @@ tags: STM32
 toc: true
 ---
 
-{% poem smoke:true author:王勃 source:滕王阁序 %}
-关山难越，谁悲失路之人；
-萍水相逢，尽是他乡之客。
-{% endpoem %} 
+
 
 <!-- toc -->
 

@@ -359,7 +359,7 @@ aplayerInject:
 inject:
   head:
     - <link rel="stylesheet" href="/css/custom.css"  media="defer" onload="this.media='all'">
-    # - <link rel="stylesheet" href="/css/modify.css">
+    - <link rel="stylesheet" href="/css/modify.css">
     - <link rel="stylesheet" href="/css/inject.css"> #文字烟雾
     - <script>
         var _hmt = _hmt || [];
@@ -388,6 +388,7 @@ inject:
     - <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
     # 2. 引入刚刚创建的本地脚本
     - <script src="/js/poem_card.js"></script>
+    - <script src="/js/top_smoke_poem.js"></script>
 
 # TOC 目录
 toc:

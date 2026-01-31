@@ -4,10 +4,6 @@ date: 2025-02-26 00:51:34
 tags: STM32
 ---
 
-{% poem smoke:true author:曹植 source:洛神赋 %}
-其形也，翩若惊鸿，婉若游龙。
-荣曜秋菊，华茂春松。
-{% endpoem %} 
 
 # Ubuntu系统搭建Vscode + CubeMx + Ozone嵌入式开发环境 
 
