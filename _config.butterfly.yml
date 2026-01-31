@@ -359,7 +359,7 @@ aplayerInject:
 inject:
   head:
     - <link rel="stylesheet" href="/css/custom.css"  media="defer" onload="this.media='all'">
-    - <link rel="stylesheet" href="/css/modify.css">
+    # - <link rel="stylesheet" href="/css/modify.css">
     - <link rel="stylesheet" href="/css/inject.css"> #文字烟雾
     - <script>
         var _hmt = _hmt || [];
@@ -383,7 +383,6 @@ inject:
     # 随机文章
     - <script src="/js/widget.js"></script>
     # 一图流（将文章的蓝框改为首页背景）
-    - <script src="/js/modify.js"></script>
     - <script src="/js/remove-duplicate-toc.js"></script> # 删除多余的目录
     # 1. 引入官方 SDK
     - <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>

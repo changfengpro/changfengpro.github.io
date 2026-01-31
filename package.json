@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@fancyapps/ui": "^5.0.36",
-    "cheerio": "^1.0.0",
+    "cheerio": "^1.2.0",
     "hexo": "^7.3.0",
     "hexo-admin": "^2.3.0",
     "hexo-admin-ehc": "^3.0.0",
