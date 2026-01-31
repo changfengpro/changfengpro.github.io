@@ -14,7 +14,7 @@ favicon: /images/title.ico
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://rmer-yhl.ip-ddns.com/
+url: http://rmer-hy.ip-ddns.com/
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -180,12 +180,12 @@ activate_power_mode:
   mobile: false
 
 fireworks:
-  enable: true
+  enable: false
   zIndex: 9999 # -1 or 9999
   mobile: false
 
 # 点击出现文字，文字可自行修改
-ClickShowText:
+clickShowText:
   enable: true
   text:
     - 富强
@@ -199,8 +199,7 @@ ClickShowText:
     - 敬业
     - 诚信
     - 友善
-  fontSize: 15px
-  random: false # 文字随机显示
+  fontSize: 25px 
   mobile: false
 
 
@@ -224,7 +223,7 @@ subtitle:
   # 2  调用一句网（简体） http://yijuzhan.com/
   # 3  调用今日诗词（简体） https://www.jinrishici.com/
   # subtitle 会先显示 source , 再显示 sub 的内容
-  source: true
+  source: false
   # 如果关闭打字效果，subtitle 只会显示 sub 的第一行文字
   sub:
     - 七分钟的飞驰&#44;源自于7000次的测试
@@ -276,6 +275,7 @@ aside:
   card_announcement:
     enable: true
     content: error0 既是开始也是终章, readme.md 既是探索亦是传承，看似遥不可及的梦早已在你脚底筑基。
+
   card_recent_post:
     enable: true
     # If set 0 will show all
@@ -376,16 +376,19 @@ inject:
     - <div class="aplayer no-destroy" data-id="13087934486" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false"> </div> 
     # - <div class="aplayer no-destroy" data-id="9405450332" data-server="tencent" data-type="playlist" data-fixed="true" data-autoplay="false"> </div> 
     - <canvas id="star-canvas"></canvas> # 鼠标滑动星星特效
-    - <script src="/js/poem.js"></script>
+    # - <script src="/js/poem.js"></script>
     - <script src="/js/star-canvas.js"></script>
-    - <script src="/js/fix-toc.js"></script>
+    # - <script src="/js/fix-toc.js"></script>
     - <script src="/js/smooth-scroll.js"></script>
     # 随机文章
     - <script src="/js/widget.js"></script>
     # 一图流（将文章的蓝框改为首页背景）
     - <script src="/js/modify.js"></script>
     - <script src="/js/remove-duplicate-toc.js"></script> # 删除多余的目录
-
+    # 1. 引入官方 SDK
+    - <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
+    # 2. 引入刚刚创建的本地脚本
+    - <script src="/js/poem_card.js"></script>
 
 # TOC 目录
 toc:
@@ -444,26 +447,48 @@ envelope_comment:
     comments: true
 
 # 电子钟
-# see https://blog.anheyu.com/posts/fc18.html
+# # see https://blog.anheyu.com/posts/fc18.html
+# electric_clock:
+#   enable: true # 开关
+#   priority: 5 #过滤器优先权
+#   enable_page: all # 应用页面
+#   exclude:
+#   # - /posts/
+#   # - /about/
+#   layout: # 挂载容器类型
+#     type: class
+#     name: sticky_layout
+#     index: 0
+#   loading: https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/loading.gif #加载动画自定义
+#   clock_css: https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/clock.min.css
+#   clock_js: https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/clock.min.js
+#   ip_api: https://widget.qweather.net/simple/static/js/he-simple-common.js?v=2.0
+#   qweather_key: b028005acd6f4c30ac65cee94165861d # 和风天气key
+#   gaud_map_key: 517a433be22bf8166948ae669843db10 # 高得地图web服务key
+#   default_rectangle: false # 开启后将一直显示rectangle位置的天气，否则将获取访问者的地理位置与天气
+#   rectangle: 112.982279,28.19409 # 获取访问者位置失败时会显示该位置的天气，同时该位置为开启default_rectangle后的位置
+
+
+# electric_clock
+# see https://anzhiy.cn/posts/fc18.html
 electric_clock:
   enable: true # 开关
   priority: 5 #过滤器优先权
   enable_page: all # 应用页面
   exclude:
-  # - /posts/
-  # - /about/
+    # - /posts/
+    # - /about/
   layout: # 挂载容器类型
     type: class
     name: sticky_layout
     index: 0
   loading: https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/loading.gif #加载动画自定义
   clock_css: https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/clock.min.css
-  clock_js: https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/clock.min.js
-  ip_api: https://widget.qweather.net/simple/static/js/he-simple-common.js?v=2.0
-  qweather_key: b028005acd6f4c30ac65cee94165861d # 和风天气key
+  clock_js: https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/clock.js
+  # qweather_key: b028005acd6f4c30ac65cee94165861d # 和风天气key
   gaud_map_key: 517a433be22bf8166948ae669843db10 # 高得地图web服务key
   default_rectangle: false # 开启后将一直显示rectangle位置的天气，否则将获取访问者的地理位置与天气
-  rectangle: 112.982279,28.19409 # 获取访问者位置失败时会显示该位置的天气，同时该位置为开启default_rectangle后的位置
+  rectangle: 112.6534116,27.96920845 # 获取访问者位置失败时会显示该位置的天气，同时该位置为开启default_rectangle后的位置
 
 # search
 search:
@@ -573,7 +598,7 @@ footer:
     since: 2025/1/1
 
 # 页脚自定义文字
-custom_text: Hi, welcome to my <a href="http://rmer-yhl.ip-ddns.com/">blog</a>!
+custom_text: Hi, welcome to my <a href="http://rmer-hy.ip-ddns.com/">blog</a>!
 
 
 #加载动画
