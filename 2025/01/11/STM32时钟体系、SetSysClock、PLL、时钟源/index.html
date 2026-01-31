@@ -1,0 +1,353 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>STM32时钟体系、SetSysClock、PLL、时钟源 | 枫花荀-RMer</title><meta name="author" content="枫花荀"><meta name="copyright" content="枫花荀"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="东风夜放花千树，更吹落、星如雨。宝马雕车香满路。 凤箫声动，玉壶光转，一夜鱼龙舞。 蛾儿雪柳黄金缕，笑语盈盈暗香去。 众里寻他千百度，蓦然回首，那人却在，灯火阑珊处。辛弃疾《青玉案》   目录      一、时钟体系 1、参考手册 2、时钟源 3、时钟树           一、时钟体系#为单片机提供一个时钟信号（非常稳定），该信号可以用于各种时钟域的同步，包括系统时钟、HCLK、PCLK1、PC">
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><meta property="og:type" content="article">
+<meta property="og:title" content="STM32时钟体系、SetSysClock、PLL、时钟源">
+<meta property="og:url" content="http://rmer-hy.ip-ddns.com/2025/01/11/STM32%E6%97%B6%E9%92%9F%E4%BD%93%E7%B3%BB%E3%80%81SetSysClock%E3%80%81PLL%E3%80%81%E6%97%B6%E9%92%9F%E6%BA%90/index.html">
+<meta property="og:site_name" content="枫花荀-RMer">
+<meta property="og:description" content="东风夜放花千树，更吹落、星如雨。宝马雕车香满路。 凤箫声动，玉壶光转，一夜鱼龙舞。 蛾儿雪柳黄金缕，笑语盈盈暗香去。 众里寻他千百度，蓦然回首，那人却在，灯火阑珊处。辛弃疾《青玉案》   目录      一、时钟体系 1、参考手册 2、时钟源 3、时钟树           一、时钟体系#为单片机提供一个时钟信号（非常稳定），该信号可以用于各种时钟域的同步，包括系统时钟、HCLK、PCLK1、PC">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://rmer-hy.ip-ddns.com/images/avatar.png">
+<meta property="article:published_time" content="2025-01-11T06:15:29.000Z">
+<meta property="article:modified_time" content="2026-01-30T14:42:20.985Z">
+<meta property="article:author" content="枫花荀">
+<meta property="article:tag" content="STM32">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://rmer-hy.ip-ddns.com/images/avatar.png"><link rel="shortcut icon" href="/images/title.ico"><link rel="canonical" href="http://rmer-hy.ip-ddns.com/2025/01/11/STM32%E6%97%B6%E9%92%9F%E4%BD%93%E7%B3%BB%E3%80%81SetSysClock%E3%80%81PLL%E3%80%81%E6%97%B6%E9%92%9F%E6%BA%90/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":3,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: 枫花荀","link":"链接: ","source":"来源: 枫花荀-RMer","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#2d3035","position":"top-center"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: true,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'STM32时钟体系、SetSysClock、PLL、时钟源',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  isShuoshuo: false
+}</script><link rel="stylesheet" href="/css/custom.css"  media="defer" onload="this.media='all'"><link rel="stylesheet" href="/css/modify.css"><link rel="stylesheet" href="/css/inject.css"><script> var _hmt = _hmt || []; (function() { var hm = document.createElement("script"); hm.src = "https://hm.baidu.com/hm.js?2397d1f3a8f641abf24a10e9215cd145"; var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(hm, s); })(); </script><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Zfour/Butterfly-card-history/baiduhistory/css/main.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Zfour/hexo-electric-clock@1.0.6/clock.css"><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/clock.min.css" /><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head><body><div id="web_bg" style="background-image: url(/images/rm舞台低亮度版.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">1</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li><li><a class="site-page child" href="javascript:randomPost();"><i class="fa-fw fa-solid fa-shuffle"></i><span> 随机文章</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/messegeboard/"><i class="fa-fw fas fa-comment"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><img class="site-icon" src="/images/rm.jpg" alt="Logo"><span class="site-name">枫花荀-RMer</span></a><a class="nav-page-title" href="/"><span class="site-name">STM32时钟体系、SetSysClock、PLL、时钟源</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li><li><a class="site-page child" href="javascript:randomPost();"><i class="fa-fw fa-solid fa-shuffle"></i><span> 随机文章</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/messegeboard/"><i class="fa-fw fas fa-comment"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">STM32时钟体系、SetSysClock、PLL、时钟源</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-01-11T06:15:29.000Z" title="发表于 2025-01-11 14:15:29">2025-01-11</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-01-30T14:42:20.985Z" title="更新于 2026-01-30 22:42:20">2026-01-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/STM32/">STM32</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">861</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>2分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><blockquote id="poem-container" class="poem-container"><span class="poem-char" onmouseover="this.classList.add('active')">东</span><span class="poem-char" onmouseover="this.classList.add('active')">风</span><span class="poem-char" onmouseover="this.classList.add('active')">夜</span><span class="poem-char" onmouseover="this.classList.add('active')">放</span><span class="poem-char" onmouseover="this.classList.add('active')">花</span><span class="poem-char" onmouseover="this.classList.add('active')">千</span><span class="poem-char" onmouseover="this.classList.add('active')">树</span><span class="poem-char" onmouseover="this.classList.add('active')">，</span><span class="poem-char" onmouseover="this.classList.add('active')">更</span><span class="poem-char" onmouseover="this.classList.add('active')">吹</span><span class="poem-char" onmouseover="this.classList.add('active')">落</span><span class="poem-char" onmouseover="this.classList.add('active')">、</span><span class="poem-char" onmouseover="this.classList.add('active')">星</span><span class="poem-char" onmouseover="this.classList.add('active')">如</span><span class="poem-char" onmouseover="this.classList.add('active')">雨</span><span class="poem-char" onmouseover="this.classList.add('active')">。</span><span class="poem-char" onmouseover="this.classList.add('active')">宝</span><span class="poem-char" onmouseover="this.classList.add('active')">马</span><span class="poem-char" onmouseover="this.classList.add('active')">雕</span><span class="poem-char" onmouseover="this.classList.add('active')">车</span><span class="poem-char" onmouseover="this.classList.add('active')">香</span><span class="poem-char" onmouseover="this.classList.add('active')">满</span><span class="poem-char" onmouseover="this.classList.add('active')">路</span><span class="poem-char" onmouseover="this.classList.add('active')">。</span><span class="poem-char" onmouseover="this.classList.add('active')">
+<!-- hexo-inject:begin --><!-- hexo-inject:end --></span><span class="poem-char" onmouseover="this.classList.add('active')">凤</span><span class="poem-char" onmouseover="this.classList.add('active')">箫</span><span class="poem-char" onmouseover="this.classList.add('active')">声</span><span class="poem-char" onmouseover="this.classList.add('active')">动</span><span class="poem-char" onmouseover="this.classList.add('active')">，</span><span class="poem-char" onmouseover="this.classList.add('active')">玉</span><span class="poem-char" onmouseover="this.classList.add('active')">壶</span><span class="poem-char" onmouseover="this.classList.add('active')">光</span><span class="poem-char" onmouseover="this.classList.add('active')">转</span><span class="poem-char" onmouseover="this.classList.add('active')">，</span><span class="poem-char" onmouseover="this.classList.add('active')">一</span><span class="poem-char" onmouseover="this.classList.add('active')">夜</span><span class="poem-char" onmouseover="this.classList.add('active')">鱼</span><span class="poem-char" onmouseover="this.classList.add('active')">龙</span><span class="poem-char" onmouseover="this.classList.add('active')">舞</span><span class="poem-char" onmouseover="this.classList.add('active')">。</span><span class="poem-char" onmouseover="this.classList.add('active')">
+</span><span class="poem-char" onmouseover="this.classList.add('active')">蛾</span><span class="poem-char" onmouseover="this.classList.add('active')">儿</span><span class="poem-char" onmouseover="this.classList.add('active')">雪</span><span class="poem-char" onmouseover="this.classList.add('active')">柳</span><span class="poem-char" onmouseover="this.classList.add('active')">黄</span><span class="poem-char" onmouseover="this.classList.add('active')">金</span><span class="poem-char" onmouseover="this.classList.add('active')">缕</span><span class="poem-char" onmouseover="this.classList.add('active')">，</span><span class="poem-char" onmouseover="this.classList.add('active')">笑</span><span class="poem-char" onmouseover="this.classList.add('active')">语</span><span class="poem-char" onmouseover="this.classList.add('active')">盈</span><span class="poem-char" onmouseover="this.classList.add('active')">盈</span><span class="poem-char" onmouseover="this.classList.add('active')">暗</span><span class="poem-char" onmouseover="this.classList.add('active')">香</span><span class="poem-char" onmouseover="this.classList.add('active')">去</span><span class="poem-char" onmouseover="this.classList.add('active')">。</span><span class="poem-char" onmouseover="this.classList.add('active')">
+</span><span class="poem-char" onmouseover="this.classList.add('active')">众</span><span class="poem-char" onmouseover="this.classList.add('active')">里</span><span class="poem-char" onmouseover="this.classList.add('active')">寻</span><span class="poem-char" onmouseover="this.classList.add('active')">他</span><span class="poem-char" onmouseover="this.classList.add('active')">千</span><span class="poem-char" onmouseover="this.classList.add('active')">百</span><span class="poem-char" onmouseover="this.classList.add('active')">度</span><span class="poem-char" onmouseover="this.classList.add('active')">，</span><span class="poem-char" onmouseover="this.classList.add('active')">蓦</span><span class="poem-char" onmouseover="this.classList.add('active')">然</span><span class="poem-char" onmouseover="this.classList.add('active')">回</span><span class="poem-char" onmouseover="this.classList.add('active')">首</span><span class="poem-char" onmouseover="this.classList.add('active')">，</span><span class="poem-char" onmouseover="this.classList.add('active')">那</span><span class="poem-char" onmouseover="this.classList.add('active')">人</span><span class="poem-char" onmouseover="this.classList.add('active')">却</span><span class="poem-char" onmouseover="this.classList.add('active')">在</span><span class="poem-char" onmouseover="this.classList.add('active')">，</span><span class="poem-char" onmouseover="this.classList.add('active')">灯</span><span class="poem-char" onmouseover="this.classList.add('active')">火</span><span class="poem-char" onmouseover="this.classList.add('active')">阑</span><span class="poem-char" onmouseover="this.classList.add('active')">珊</span><span class="poem-char" onmouseover="this.classList.add('active')">处</span><span class="poem-char" onmouseover="this.classList.add('active')">。</span></blockquote><footer style="text-align: right"><strong>辛弃疾</strong><cite>《青玉案》</cite></footer><script src="/js/smoke.js"></script> 
+
+<p><em><strong>目录</strong></em></p>
+<div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#yi-shi-zhong-ti-xi">一、时钟体系</a><ul>
+<li><a href="#1-can-kao-shou-ce">1、参考手册</a></li>
+<li><a href="#2-shi-zhong-yuan">2、时钟源</a></li>
+<li><a href="#3-shi-zhong-shu">3、时钟树</a></li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<!-- * [一、时钟体系](#一时钟体系) 
+    * [1、参考手册](#1参考手册)
+    * [2、时钟源](#2时钟源)
+    * [3、时钟树](#3时钟树)
+    * [4. 时钟详解](#4-时钟详解)
+        * [HSE时钟](#hse时钟)
+        * [锁相环时钟](#锁相环时钟)
+        * [系统时钟](#系统时钟)
+        * [HCLK时钟](#hclk时钟)
+        * [PCLK1时钟](#pclk1时钟)
+        * [PCLK2时钟](#pclk2时钟)
+        * [RTC时钟](#rtc时钟)
+        * [独立看门狗时钟：](#独立看门狗时钟)
+        * [I2S时钟：](#i2s时钟)
+        * [以太网PHY时钟：](#以太网phy时钟)
+        * [USB PHY时钟：](#usb-phy时钟)
+        * [MCO时钟输出](#mco时钟输出)
+    * [系统时钟配置函数SetSysClock()](#系统时钟配置函数setsysclock)
+    * [系统时钟配置流程](#系统时钟配置流程)
+
+* [二、PLL](#二pll)
+
+  * [2.1 概述](#21-概述)
+  * [2.2 基本组成](#22-基本组成)
+  * [2.3 类比说明](#23-类比说明)
+  * [2.3 相位差\[拓展\]](#23-相位差拓展)
+
+* [三、SystemInit系统初始化函数](#三systeminit系统初始化函数)
+
+  * [1.第一个执行的文件是汇编文件](#1第一个执行的文件是汇编文件)
+  * [2.初始化Flash接口，更新PLL系统频率](#2初始化flash接口更新pll系统频率)
+  * [3.调用SetSysClock函数设置PLL时钟，然后进行分频](#3调用setsysclock函数设置pll时钟然后进行分频)
+  * [4.阅读system\_stm32f4xx.c文件的头部注释](#4阅读system_stm32f4xxc文件的头部注释)
+
+* [**四、时钟源**](#四时钟源)
+
+* [参考文章](#参考文章) -->
+
+
+<h1><span id="yi-shi-zhong-ti-xi">一、时钟体系</span><a href="#yi-shi-zhong-ti-xi" class="header-anchor">#</a></h1><p>为单片机提供一个时钟信号（非常稳定），该信号可以用于各种时钟域的同步，包括系统时钟、HCLK、PCLK1、PCLK2、I2S时钟、USB PHY时钟、以太网PHY时钟等。<br>STM32的<mark style="background-color:yellow;">时钟系统由外部晶振、PLL（锁相环）和内部 RC 振荡器组成</mark></p>
+<p>其作用包括：</p>
+<ul>
+<li>为处理器提供准确的时钟信号，保证处理器、总线和外设的正确工作。</li>
+<li><mark style="background-color:yellow;">通过 PLL 的倍频功能</mark>，产生多种频率的时钟信号，满足不同外设的时钟需求。</li>
+<li>通过时钟系统提供的时钟分频器、预分频器等功能，进一步调整时钟频率，以适应不同的应用场景。</li>
+</ul>
+<p><em><strong>时钟系统在 STM32 的系统中扮演着关键的角色，它的稳定性和精度对整个系统的性能影响很大</strong></em></p>
+<h2><span id="1-can-kao-shou-ce">1、参考手册</span><a href="#1-can-kao-shou-ce" class="header-anchor">#</a></h2><p><code style="color: red;">STM32F4xx 中文参考手册.pdf 第 106 页</code></p>
+<h2><span id="2-shi-zhong-yuan">2、时钟源</span><a href="#2-shi-zhong-yuan" class="header-anchor">#</a></h2><p>STM32F407IG可以使用三种不同的时钟源来驱动*系统时钟 (SYSCLK)*，CPU 运行的最高频率为 168MHz。</p>
+<ul>
+<li><p><em><strong>HSI（High-Speed Internal）振荡器时钟</strong></em>：内部高速时钟源，适用于简单、低功耗的应用，但如果需要更高的时钟精度或更快的时钟频率，可以选择外部晶振或通过PLL来调整时钟频率。</p>
+</li>
+<li><p><em><strong>HSE（High-Speed External）振荡器时钟</strong></em>： 高速外部时钟源 16MHz-32.768MHz，用于高速、高精度的应用。</p>
+</li>
+<li><p><em><strong>主 PLL (PLL) 时钟</strong></em>：主PLL主要通过倍频技术将较低频率的输入时钟（如HSE或HSI）转化为更高频率的输出时钟。例如，PLL可以将一个16 MHz的HSE时钟信号通过配置倍频因子输出更高的频率（例如，32 MHz、48 MHz等），为系统提供所需的高精度、高频时钟。</p>
+<ul>
+<li><em><strong>32 kHZ 低速内部 RC（LSI RC）</strong></em>：LSI 是一个内部的低速 RC 振荡器，通常在 32 MHz 频率下工作。LSI 可以驱动独立看门狗（IWDG），确保系统在发生故障时可以被复位。此外，LSI 还可以提供给RTC（实时时钟）用于 停机 或者 待机模式下的自动唤醒。</li>
+<li><em><strong>32.768 kHz 低速外部晶振（LSE 晶振）</strong></em>： LSE 是一个低频外部晶振，通常为 32.768 kHz。它主要用于驱动 RTC 时钟（RTCCLK），提供精确的时钟信号以支持系统的时间跟踪功能，尤其在长时间运行和电池供电应用中非常重要。</li>
+</ul>
+</li>
+</ul>
+<p><em>STM32 微控制器支持在不需要时关闭不必要的时钟源，以进一步降低功耗。这些次级时钟源（LSI 和 LSE）都可以根据应用的需求单独启用或禁用。例如：</em></p>
+<ul>
+<li><strong>禁用</strong> LSI 或 LSE：如果不需要低速时钟源，用户可以禁用它们，以节省功耗。</li>
+<li><strong>启用</strong> LSI 或 LSE：如果系统进入待机模式或需要 RTC 时钟工作，用户可以启用相应的时钟源。</li>
+</ul>
+<h2><span id="3-shi-zhong-shu">3、时钟树</span><a href="#3-shi-zhong-shu" class="header-anchor">#</a></h2><p>STM32F407IG 时钟树如下图所示：</p>
+<p><img src="/images/STM32%E6%97%B6%E9%92%9F%E4%BD%93%E7%B3%BB/%E6%97%B6%E9%92%9F%E6%A0%91.png" alt="时钟树"></p>
+<hr>
+<p>—————持续更新中—————</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://rmer-hy.ip-ddns.com">枫花荀</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://rmer-hy.ip-ddns.com/2025/01/11/STM32%E6%97%B6%E9%92%9F%E4%BD%93%E7%B3%BB%E3%80%81SetSysClock%E3%80%81PLL%E3%80%81%E6%97%B6%E9%92%9F%E6%BA%90/">http://rmer-hy.ip-ddns.com/2025/01/11/STM32%E6%97%B6%E9%92%9F%E4%BD%93%E7%B3%BB%E3%80%81SetSysClock%E3%80%81PLL%E3%80%81%E6%97%B6%E9%92%9F%E6%BA%90/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://rmer-hy.ip-ddns.com" target="_blank">枫花荀-RMer</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/STM32/">STM32</a></div><div class="post-share"><div class="social-share" data-image="/images/avatar.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/02/26/Ubuntu%E4%B8%8B%E7%9A%84STM32%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA-Vscode-CubeMX-Ozone/" title="Ubuntu下的STM32开发环境搭建(Vscode + CubeMX + Ozone)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Ubuntu下的STM32开发环境搭建(Vscode + CubeMX + Ozone)</div></div><div class="info-2"><div class="info-item-1">其形也，翩若惊鸿，婉若游龙。 荣曜秋菊，华茂春松。曹植《洛神赋》   Ubuntu系统搭建Vscode + CubeMx + Ozone嵌入式开发环境# 一、换源#1. 备份源列表#   sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak 2. 命令行打开source.list文件#   sudo gedit /etc/apt/sources.list 3. 修改source.list文件，更换源# 我个人更推荐使用中科大源  1234567891011#  中科大镜像源deb https://mirrors.ustc.edu.cn/ubuntu/ bionic main restricted universe multiversedeb-src https://mirrors.ustc.edu.cn/ubuntu/ bionic main restricted universe multiversedeb https://mirrors.ustc.edu.cn/ubuntu/ bionic-updates main...</div></div></div></a><a class="pagination-related" href="/2025/01/02/RoboMaster/" title="RoboMaster"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">RoboMaster</div></div><div class="info-2"><div class="info-item-1">时运不齐，命运多舛。 屈贾谊于长沙，非无圣主。 所赖君子见机，得志者少。 所以沧海横流，方显英雄本色。王勃《滕王阁序》   RMUC总决赛  深圳-春茧# </div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/03/05/JLink%E5%88%B7%E5%9B%BA%E4%BB%B6/" title="JLink刷固件"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-05</div><div class="info-item-2">JLink刷固件</div></div><div class="info-2"><div class="info-item-1">关山难越，谁悲失路之人； 萍水相逢，尽是他乡之客。王勃《滕王阁序》        JLinK刷固件教程 jlink刷固件及解决报错克隆问题 2.然后打开SEGGER . J-Link v7.22b文件夹中的J-Flash Lite v7.22b 3.第一步点击红色箭头处的三个点，选择jlink固件&#x2F;OB-STM32_V754_Addr-0x8000000_Change date to  to 30-02-02(Licensed-CBT6-128K_USE).hex 4.烧写完成后打开jlink制固件教程（解诀报错盗版克隆）\SEGGER - J-Link v7.22b\J-Link Comander v7.22b 5.最后就是输入license     JLink提取固件教程 附录      JLinK刷固件教程#解决市面上购买到的盗版jlink使用Ozone时的报错问题（采用重刷固件及添加License的方式）  需要准备一个能正常使用的jlink(提示盗版的也可以)  jlink刷固件及解决报错克隆问题#1.首先将jlink与被刷入的jlink连接  3.3...</div></div></div></a><a class="pagination-related" href="/2025/02/26/Ubuntu%E4%B8%8B%E7%9A%84STM32%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA-Vscode-CubeMX-Ozone/" title="Ubuntu下的STM32开发环境搭建(Vscode + CubeMX + Ozone)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-02-26</div><div class="info-item-2">Ubuntu下的STM32开发环境搭建(Vscode + CubeMX + Ozone)</div></div><div class="info-2"><div class="info-item-1">其形也，翩若惊鸿，婉若游龙。 荣曜秋菊，华茂春松。曹植《洛神赋》   Ubuntu系统搭建Vscode + CubeMx + Ozone嵌入式开发环境# 一、换源#1. 备份源列表#   sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak 2. 命令行打开source.list文件#   sudo gedit /etc/apt/sources.list 3. 修改source.list文件，更换源# 我个人更推荐使用中科大源  1234567891011#  中科大镜像源deb https://mirrors.ustc.edu.cn/ubuntu/ bionic main restricted universe multiversedeb-src https://mirrors.ustc.edu.cn/ubuntu/ bionic main restricted universe multiversedeb https://mirrors.ustc.edu.cn/ubuntu/ bionic-updates main...</div></div></div></a></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/images/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">枫花荀</div><div class="author-info-description">一个想进对抗赛的RMer</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">1</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/changfengpro"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/changfengpro" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:info@rmer-hy.ip-ddns.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #39c7f3;"></i></a><a class="social-icon" href="https://space.bilibili.com/486102015?spm_id_from=333.1007.0.0" target="_blank" title="bilibili"><i class="fab fa-bilibili" style="color: #00b3ef;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">error0 既是开始也是终章, readme.md 既是探索亦是传承，看似遥不可及的梦早已在你脚底筑基。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#yi-shi-zhong-ti-xi"><span class="toc-number">1.</span><span class="toc-text">一、时钟体系</span></a></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-can-kao-shou-ce"><span class="toc-number">1.1.</span><span class="toc-text">1、参考手册</span></a></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-shi-zhong-yuan"><span class="toc-number">1.2.</span><span class="toc-text">2、时钟源</span></a></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-shi-zhong-shu"><span class="toc-number">1.3.</span><span class="toc-text">3、时钟树</span></a></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/01/30/hello-world/" title="Hello World">Hello World</a><time datetime="2026-01-30T14:42:20.985Z" title="发表于 2026-01-30 22:42:20">2026-01-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/05/JLink%E5%88%B7%E5%9B%BA%E4%BB%B6/" title="JLink刷固件">JLink刷固件</a><time datetime="2025-03-05T14:56:28.000Z" title="发表于 2025-03-05 22:56:28">2025-03-05</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/26/Ubuntu%E4%B8%8B%E7%9A%84STM32%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA-Vscode-CubeMX-Ozone/" title="Ubuntu下的STM32开发环境搭建(Vscode + CubeMX + Ozone)">Ubuntu下的STM32开发环境搭建(Vscode + CubeMX + Ozone)</a><time datetime="2025-02-25T16:51:34.000Z" title="发表于 2025-02-26 00:51:34">2025-02-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/11/STM32%E6%97%B6%E9%92%9F%E4%BD%93%E7%B3%BB%E3%80%81SetSysClock%E3%80%81PLL%E3%80%81%E6%97%B6%E9%92%9F%E6%BA%90/" title="STM32时钟体系、SetSysClock、PLL、时钟源">STM32时钟体系、SetSysClock、PLL、时钟源</a><time datetime="2025-01-11T06:15:29.000Z" title="发表于 2025-01-11 14:15:29">2025-01-11</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/02/RoboMaster/" title="RoboMaster">RoboMaster</a><time datetime="2025-01-02T05:59:38.000Z" title="发表于 2025-01-02 13:59:38">2025-01-02</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2025/1/1 - 2026 By 枫花荀</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.isShuoshuo
+  const option = null
+
+  const getCount = () => {
+    const countELement = document.getElementById('twikoo-count')
+    if(!countELement) return
+    twikoo.getCommentsCount({
+      envId: 'https://rmer-comment.netlify.app/.netlify/functions/twikoo',
+      region: 'AWS / Hong Kong (ap-east-1)',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(res => {
+      countELement.textContent = res[0].count
+    }).catch(err => {
+      console.error(err)
+    })
+  }
+
+  const init = (el = document, path = location.pathname) => {
+    twikoo.init({
+      el: el.querySelector('#twikoo-wrap'),
+      envId: 'https://rmer-comment.netlify.app/.netlify/functions/twikoo',
+      region: 'AWS / Hong Kong (ap-east-1)',
+      onCommentLoaded: () => {
+        btf.loadLightbox(document.querySelectorAll('#twikoo .tk-content img:not(.tk-owo-emotion)'))
+      },
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || path
+    })
+
+    
+
+    isShuoshuo && (window.shuoshuoComment.destroyTwikoo = () => {
+      if (el.children.length) {
+        el.innerHTML = ''
+        el.classList.add('no-comment')
+      }
+    })
+  }
+
+  const loadTwikoo = (el, path) => {
+    if (typeof twikoo === 'object') setTimeout(() => init(el, path), 0)
+    else btf.getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(() => init(el, path))
+  }
+
+  if (isShuoshuo) {
+    'Twikoo' === 'Twikoo'
+      ? window.shuoshuoComment = { loadComment: loadTwikoo }
+      : window.loadOtherComment = loadTwikoo
+    return
+  }
+
+  if ('Twikoo' === 'Twikoo' || !false) {
+    if (false) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else loadTwikoo()
+  } else {
+    window.loadOtherComment = loadTwikoo
+  }
+})()</script></div><div class="aplayer no-destroy" data-id="13087934486" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false"> </div><canvas id="star-canvas"></canvas><script src="/js/star-canvas.js"></script><script src="/js/smooth-scroll.js"></script><script src="/js/widget.js"></script><script src="/js/modify.js"></script><script src="/js/remove-duplicate-toc.js"></script><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = false;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-show-text" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-show-text.min.js" data-mobile="false" data-text="富强,民主,文明,和谐,自由,平等,公正,法治,敬业,诚信,友善" data-fontsize="25px" data-random="false" async="async"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="search the post..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><!-- hexo injector body_end start --><script data-pjax>function history_calendar_injector_config(){
+                var parent_div_git = document.getElementsByClassName('sticky_layout')[0];
+                var item_html = '<div class="card-widget card-history"><div class="card-content"><div class="item-headline"><i class="fas fa-clock fa-spin"></i><span>那年今日</span></div><div id="history-baidu" style="height: 100px;overflow: hidden"><div class="history_swiper-container" id="history-container" style="width: 100%;height: 100%"><div class="swiper-wrapper" id="history_container_wrapper" style="height:20px"></div></div></div></div>';
+                console.log('已挂载history_calendar')
+                // parent_div_git.innerHTML=item_html+parent_div_git.innerHTML // 无报错，但不影响使用(支持pjax跳转)
+                parent_div_git.insertAdjacentHTML("afterbegin",item_html) // 有报错，但不影响使用(支持pjax跳转)
+            }if( document.getElementsByClassName('sticky_layout')[0] && (location.pathname ==='all'|| 'all' ==='all')){
+
+            history_calendar_injector_config()
+        } </script><script data-pjax  src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script><script data-pjax src="https://cdn.jsdelivr.net/gh/Zfour/Butterfly-card-history/baiduhistory/js/main.js"></script><script data-pjax>function electric_clock_injector_config(){
+                var parent_div_git = document.getElementsByClassName('sticky_layout')[0];
+                var item_html = 'undefined';
+                console.log('已挂载electric_clock')
+                // parent_div_git.innerHTML=item_html+parent_div_git.innerHTML // 无报错，但不影响使用(支持pjax跳转)
+                parent_div_git.insertAdjacentHTML("afterbegin",item_html) // 有报错，但不影响使用(支持pjax跳转)
+            }if( document.getElementsByClassName('sticky_layout')[0] && (location.pathname ==='all'|| 'all' ==='all')){
+
+            electric_clock_injector_config()
+        } </script><script src="https://pv.sohu.com/cityjson?ie=utf-8"></script><script data-pjax  src="https://cdn.jsdelivr.net/gh/Zfour/hexo-electric-clock@1.0.6/clock.js"></script><script data-pjax>
+  function butterfly_clock_anzhiyu_injector_config(){
+    var parent_div_git = document.getElementsByClassName('sticky_layout')[0];
+    var item_html = '<div class="card-widget card-clock"><div class="card-glass"><div class="card-background"><div class="card-content"><div id="hexo_electric_clock"><img class="entered loading" id="card-clock-loading" src="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/loading.gif" style="height: 120px; width: 100%;" data-ll-status="loading"/></div></div></div></div></div>';
+    console.log('已挂载butterfly_clock_anzhiyu-yang修复版')
+    if(parent_div_git) {
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var qweather_key = 'b16a1fa0e63c46a4b8f28abfb06ae3fe';
+  var gaud_map_key = '517a433be22bf8166948ae669843db10';
+  var baidu_ak_key = 'undefined';
+  var flag = 0;
+  var clock_rectangle = '112.6534116,27.96920845';
+  var clock_default_rectangle_enable = 'false';
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_clock_anzhiyu_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_clock_anzhiyu_injector_config();
+  }
+  </script><script data-pjax src="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/clock.js"></script><!-- hexo injector body_end end --><!-- hexo-inject:begin --><!-- hexo-inject:end --></body></html>
