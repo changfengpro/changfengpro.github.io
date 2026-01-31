@@ -358,6 +358,7 @@ aplayerInject:
 # 注入
 inject:
   head:
+    - <meta name="referrer" content="no-referrer">
     - <link rel="stylesheet" href="/css/custom.css"  media="defer" onload="this.media='all'">
     - <link rel="stylesheet" href="/css/modify.css">
     - <link rel="stylesheet" href="/css/inject.css"> #文字烟雾

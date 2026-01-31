@@ -14,14 +14,14 @@ tags:
 # 二、安装Arm GNU Toolchain
 >下载地址：[Arm GNU Toolchain](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
 
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/931bd539a341438abf33652f274a4018.png)
+![](/images/Windows下搭建Vscode-Ozone-CubeMX-Arm-GNU-Toolchain-Makefile-STM32开发环境/image.png)
 >下载***arm-gnu-toolchain-15.2.rel1-mingw-w64-x86_64-arm-none-eabi.msi***
 最好安装到D盘，也可以下载.zip，自己设置环境变量
 
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/e3414f6e3a8749e49cf533b58f6d536c.png)
+![](/images/Windows下搭建Vscode-Ozone-CubeMX-Arm-GNU-Toolchain-Makefile-STM32开发环境/e3414f6e3a8749e49cf533b58f6d536c.png)
 >输入`arm-none-eabi-gcc -v`看下环境是否设置成功
 
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/ce9ba859f59b47689e53ca68abd51924.png)
+![](/images/Windows下搭建Vscode-Ozone-CubeMX-Arm-GNU-Toolchain-Makefile-STM32开发环境/ce9ba859f59b47689e53ca68abd51924.png)
 # 三、安装chocolatey
 >管理员模式运行PowerShell，然后输入以下代码
 ```
@@ -41,7 +41,7 @@ choco config set customInstallLocation "D:\Program Files\chocolatey_install“
 choco install make
 ```
 >设置环境变量
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/5481249617604b958ee9b70e912f1084.png)
+![](/images/Windows下搭建Vscode-Ozone-CubeMX-Arm-GNU-Toolchain-Makefile-STM32开发环境/5481249617604b958ee9b70e912f1084.png)
 
 >测试make是否安装成功
 
@@ -49,5 +49,5 @@ choco install make
 # 在cmd或者PowerShell中输入
 make -v
 ```
-![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/7f1c1c9ac95c444687005ea6d76dffcf.png)
+![](/images/Windows下搭建Vscode-Ozone-CubeMX-Arm-GNU-Toolchain-Makefile-STM32开发环境/7f1c1c9ac95c444687005ea6d76dffcf.png)
 >至此本教程结束
