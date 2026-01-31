@@ -1,41 +1,160 @@
-/* 自定义的css写在这里 */
-.poem-container {
-    font-family: '华文行楷', '方正行楷繁体', '方正行楷简体',  Xingkai SC;
-    font-size: 1.2em;
-    margin: 1.6em 20px;
-    text-align: center;
-    background-color: transparent;
-    border-left: 0px;
-
+/* ============================================================
+   1. 文章页顶部透明化 (解决蓝色大块问题)
+   ============================================================ */
+#page-header.post-bg {
+    background: transparent !important;
+    background-image: none !important;
 }
 
-blockquote  span{
+#page-header {
+    background: transparent !important;
+}
+
+/* ============================================================
+   2. 顶部动态诗词容器样式
+   ============================================================ */
+/* 顶部动态诗词容器样式 */
+.poem-custom-container {
+    font-family: '华文行楷', '方正行楷繁体', '方正行楷简体', 'Xingkai SC', serif;
+    /* 将字体从 1.5em 提升到 2.2em，增强视觉冲击力 */
+    font-size: 2em; 
+    /* 增加上下间距，防止字大了显得拥挤 */
+    margin: 30px auto; 
+    text-align: center;
+    color: #ffffff;
+    /* 加深阴影，确保大字体在复杂背景下依然清晰 */
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.7); 
+    z-index: 10;
+}
+
+/* 微调字间距 */
+.smoke-wrap span {
     position: relative;
     display: inline-block;
     user-select: none;
-    /* cursor: pointer; */
+    cursor: pointer;
+    /* 字大了之后，间距也要稍微拉开一点点 */
+    margin: 0 5px; 
+    transition: all 0.3s ease;
 }
 
-blockquote span.active{
+/* 作者信息保持适中，不要跟诗词抢戏 */
+.smoke-author {
+    font-size: 0.6em; /* 相对于父级 2.2em，这个比例比较优雅 */
+    opacity: 0.8;
+    text-align: right;
+    margin-top: 20px;
+    padding-right: 15%; /* 让作者名字往中间靠一点，不要太贴边 */
+    font-family: "STKaiti", "KaiTi", serif;
+}
+
+/* ============================================================
+   3. 文字烟雾核心动画 (Active 类触发)
+   ============================================================ */
+.smoke-wrap span.active {
     animation: smoke 4s linear forwards;
     transform-origin: bottom;
-    user-select: text;
 }
 
-@keyframes smoke{
-    0%{
+@keyframes smoke {
+    0% {
         opacity: 1;
         filter: blur(0);
         transform: translateX(0) translateY(0) rotate(0deg) scale(1);
     }
-    30%{
+    30% {
         opacity: 0;
         filter: blur(20px);
         transform: translateX(300px) translateY(-300px) rotate(720deg) scale(4);
     }
-    100%{
+    100% {
         opacity: 1;
+        filter: blur(0);
         transform: translateX(0) translateY(0) rotate(0deg) scale(1);
-    
     }
+}
+
+/* ============================================================
+   4. 兼容性修复 (防止误伤正文中的 blockquote)
+   ============================================================ */
+/* 确保文章正文里的引用块保持默认样式，不触发烟雾逻辑 */
+#article-container blockquote {
+    background: var(--blockquote-bg);
+    border-left: 0.2rem solid var(--blockquote-color);
+    color: var(--blockquote-color);
+}
+
+/* ============================================================
+   左侧悬浮目录：默认卡片样式 + 悬浮不占位布局
+   ============================================================ */
+@media screen and (min-width: 1200px) {
+    /* 1. 隐藏右侧原目录 */
+    #aside-content .card-toc {
+        display: none !important;
+    }
+
+    /* 2. 目录容器：采用固定悬浮，不挤压正文 */
+    #card-toc {
+        position: fixed !important;
+        left: 20px;               /* 距离左侧边缘间距 */
+        top: 100px;               /* 距离顶部间距 */
+        width: 220px;             /* 宽度保持默认卡片感 */
+        max-height: calc(100vh - 150px);
+        overflow-y: auto;
+        z-index: 90;
+        
+        /* 样式：使用 Hexo 默认卡片的白色质感 */
+        background: rgba(255, 255, 255, 0.98) !important; 
+        box-shadow: 0 3px 8px 6px rgba(7, 17, 27, 0.06) !important;
+        border-radius: 8px;
+        border: 1px solid #eee;
+        transition: opacity 0.3s, transform 0.3s;
+    }
+
+    /* 交互增强：非悬停时轻微透明，减少对背景图的遮挡 */
+    #card-toc:not(:hover) {
+        opacity: 0.8;
+    }
+
+    /* 3. 目录标题样式 */
+    #card-toc .item-headline {
+        padding: 12px 15px;
+        font-weight: bold;
+        color: #333;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* 4. 目录列表样式：恢复默认间距与字号 */
+    #card-toc .toc-content {
+        padding: 10px !important;
+    }
+
+    #card-toc .toc-link {
+        font-size: 15px !important;
+        color: #4c4948 !important;
+        line-height: 1.8 !important;
+        padding: 4px 8px !important;
+        display: block;
+        border-radius: 4px;
+    }
+
+    /* 5. 悬停高亮 */
+    #card-toc .toc-link:hover {
+        background: #49b1f5 !important;
+        color: #fff !important;
+    }
+
+    /* 6. 核心布局：正文居中，不为目录留出巨大空白 */
+    #content-inner {
+        /* 只留出 60px 的安全距离，防止正文紧贴屏幕边缘 */
+        /* 目录现在是浮在上面的，不会把正文往右推 */
+        padding-left: 60px !important; 
+        max-width: 1300px; /* 适当增加最大宽度，让正文更舒展 */
+        margin: 0 auto !important; 
+    }
+}
+
+/* 隐藏目录滚动条 */
+#card-toc::-webkit-scrollbar {
+    width: 0px;
 }
