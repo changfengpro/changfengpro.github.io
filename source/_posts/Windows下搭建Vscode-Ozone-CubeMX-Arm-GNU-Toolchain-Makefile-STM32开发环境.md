@@ -34,8 +34,8 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 # 四、安装make
 ```
 # 先设置安装环境
-choco config set cacheLocation "D:\ChocolateyCache”
-choco config set customInstallLocation "D:\Program Files\chocolatey_install“
+choco config set cacheLocation "D:\ChocolateyCache"
+choco config set customInstallLocation "D:\Program Files\chocolatey_install"
 
 # 安装make
 choco install make

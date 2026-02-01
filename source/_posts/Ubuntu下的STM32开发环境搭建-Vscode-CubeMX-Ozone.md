@@ -1,7 +1,9 @@
 ---
 title: Ubuntu下的STM32开发环境搭建(Vscode + CubeMX + Ozone)
 date: 2025-02-26 00:51:34
-tags: STM32
+tags: 
+   - STM32
+   - 开发环境搭建
 ---
 
 
